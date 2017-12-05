@@ -32,7 +32,7 @@ const callAsyncTask = (asyncTask, source, observer, action) => {
     }
   };
 
-  asyncTask({ put, call, take })
+  asyncTask({ put, call, take }, action)
     .then(finished)
     .catch(error => {
       console.error(
@@ -43,11 +43,11 @@ const callAsyncTask = (asyncTask, source, observer, action) => {
     });
 };
 
-export default asyncTask => {
+export default function(asyncTask) {
   const source = this;
   return source.mergeMap(action =>
     Observable.create(observer =>
       callAsyncTask(asyncTask, source, observer, action),
     ),
   );
-};
+}

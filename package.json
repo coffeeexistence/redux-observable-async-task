@@ -1,27 +1,28 @@
 {
   "name": "redux-observable",
   "version": "0.17.0",
-  "description":
-    "RxJS based middleware for Redux. Compose and cancel async actions and more.",
+  "description": "RxJS based middleware for Redux. Compose and cancel async actions and more.",
   "module": "lib/esm/index.js",
   "main": "lib/cjs/index.js",
   "scripts": {
     "lint": "eslint src && eslint test",
-    "build":
-      "npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:umd:min",
+    "build": "npm run build:esm && npm run build:cjs && npm run build:umd && npm run build:umd:min",
     "build:esm": "gulp build:esm",
     "build:cjs": "babel src -d lib/cjs",
-    "build:umd":
-      "cross-env NODE_ENV=development webpack src/index.js dist/redux-observable.js",
-    "build:umd:min":
-      "cross-env NODE_ENV=production webpack src/index.js dist/redux-observable.min.js",
+    "build:umd": "cross-env NODE_ENV=development webpack src/index.js dist/redux-observable.js",
+    "build:umd:min": "cross-env NODE_ENV=production webpack src/index.js dist/redux-observable.min.js",
     "build:tests": "rm -rf temp && babel test -d temp",
     "clean": "rimraf lib temp dist",
     "check": "npm run lint && npm run test",
     "test": "npm run lint && npm run build && npm run build:tests && mocha temp"
   },
   "typings": "./index.d.ts",
-  "files": ["dist", "lib", "README.md", "LICENSE"],
+  "files": [
+    "dist",
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "Rx",
     "Ducks",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
+    "babel-core": "^6.26.0",
     "babel-eslint": "^7.0.0",
     "babel-loader": "^7.0.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.11.5",

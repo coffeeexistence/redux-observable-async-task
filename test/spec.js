@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 /* globals describe it */
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { expect } from 'chai';
 import callAsyncTask from '../lib/cjs';
 
@@ -29,8 +29,8 @@ describe('callAsyncTask operator', () => {
   });
 
   it('should return an observable', () => {
-    const epic = Observable.of(fooActionCreator())
-      ::callAsyncTask(async () => {});
+    const asyncTask = async () => {};
+    const epic = Observable.of(fooActionCreator())::callAsyncTask(asyncTask);
     expect(epic.subscribe).to.exist;
   });
 
@@ -95,5 +95,43 @@ describe('callAsyncTask operator', () => {
         expect(actions).to.deep.equal([barActionCreator()]);
       }, done);
     });
+  });
+
+  describe('TAKE', () => {
+    it('should resolve when action emiited which meets filter criteria', done => {
+      const actionStream = new Subject();
+      const epic = Observable.from(actionStream)
+        .filter(action => action.type === 'INITIAL_ACTION')
+        ::callAsyncTask(async ({ take, put }) => {
+          await take(action => action.type === 'BAR');
+          put({ type: 'GOT_BAR' });
+        });
+
+      verifyActions(epic, actions => {
+        expect(actions).to.deep.equal([{ type: 'GOT_BAR' }]);
+      }, done);
+
+      actionStream.next({ type: 'INITIAL_ACTION' });
+      actionStream.next({ type: 'BAR' });
+      actionStream.complete();
+    });
+  });
+
+  it('should resolve with the first action that met the filter criteria', done => {
+    const actionStream = new Subject();
+    const epic = Observable.from(actionStream)
+      .filter(action => action.type === 'INITIAL_ACTION')
+      ::callAsyncTask(async ({ take, put }) => {
+        const { payload } = await take(action => action.type === 'BAR');
+        put({ type: 'GOT_BAR', payload });
+      });
+
+    verifyActions(epic, actions => {
+      expect(actions).to.deep.equal([{ type: 'GOT_BAR', payload: 'payload' }]);
+    }, done);
+
+    actionStream.next({ type: 'INITIAL_ACTION' });
+    actionStream.next({ type: 'BAR', payload: 'payload' });
+    actionStream.complete();
   });
 });

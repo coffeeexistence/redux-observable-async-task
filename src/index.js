@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-const callAsyncTask = (asyncTask, source, observer, action) => {
+const callAsyncTask = ({ asyncTask, source, observer, action }) => {
   const put = actionToEmit => observer.next(actionToEmit);
 
   const take = filterFn =>
@@ -47,7 +47,7 @@ export default function(asyncTask) {
   const source = this;
   return source.mergeMap(action =>
     Observable.create(observer =>
-      callAsyncTask(asyncTask, source, observer, action),
+      callAsyncTask({ asyncTask, source: source.source, observer, action }),
     ),
   );
 }
